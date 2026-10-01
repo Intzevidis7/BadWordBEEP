@@ -1,0 +1,32 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Build products (attach tested installer separately to a GitHub Release)
+build/
+dist/
+release/
+*.spec
+
+# Downloaded models, local settings, recordings, logs
+models/
+settings.json
+*.wav
+*.mkv
+*.mp4
+*.mov
+*.webm
+*.log
+
+# Editor, environment and OS debris
+.vscode/
+.idea/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db

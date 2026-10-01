@@ -1,0 +1,29 @@
+# One normalized exact word per line; edit to your stream rules.
+# Greek accents/capitalization ignored; plurals and inflections require separate entries.
+fuck
+fucking
+fucked
+fucker
+fuckers
+shit
+bitch
+bitches
+asshole
+assholes
+bastard
+cunt
+μαλάκας
+μαλάκα
+μαλάκες
+μαλακία
+μαλακίες
+σκατά
+πούστης
+πούστη
+γαμώ
+γαμό
+γαμήσου
+γαμί
+γαμμί
+κουράδες
+βλάκα
