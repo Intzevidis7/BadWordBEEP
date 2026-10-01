@@ -1,40 +1,121 @@
 # Bad Word Beep — Greek + English
 
-A **local, experimental** microphone censor for Windows and OBS. The desktop app runs two Vosk recognizers (Greek and English) against the same microphone input. Recognized words listed in `bad_words.txt` are replaced with a beep in a delayed audio feed sent through VB-CABLE to OBS. It runs on CPU; it does not use an AMD/NVIDIA GPU, require a cloud transcription account, or upload mic audio. Transcripts appear in the app's log.
+A **local, experimental** microphone censor for Windows and OBS. The desktop app runs two Vosk recognizers—Greek and English—against the same microphone input. Words listed in `bad_words.txt` are replaced with a beep in a delayed audio feed sent through VB-CABLE to OBS.
 
-> **Not a guaranteed profanity filter.** It can miss words, beep innocent speech, or identify a word after it has played. Your installed Windows version has been reported working by the project tester, but every new build and audio routing configuration should still be tested using an OBS recording before streaming.
+The app runs on CPU. It does not require an AMD/NVIDIA GPU, a cloud transcription account, or intentional audio uploads. Transcripts appear in the app log.
 
-## Install and run
+> **Important:** This is not a guaranteed profanity filter. It can miss words, beep innocent speech, or recognize a word after it has already played. Always test with a local OBS recording before streaming.
 
-If you just want to use the program, you need **`BadWordBeep-Setup.exe`** from this project's GitHub Release; you do *not* need Python or Inno Setup. Do not download only `app.py` or `BadWordBeep.exe` and expect a complete install.
+## Quick start
 
-1. Install [VB-CABLE](https://vb-audio.com/Cable/) using the vendor's Windows instructions, and [OBS Studio](https://obsproject.com/download), if you have not already. VB-CABLE is a separate Windows audio driver; this installer does **not** download or install it, and a reboot may be required.
-2. Run `BadWordBeep-Setup.exe`. It installs the app for your Windows user and adds a Start menu shortcut; an optional desktop shortcut is offered. The installer is not code-signed by this project, so verify the release before running it.
-3. At the end, select **Download Greek and English Vosk models**. A console window will download/extract both models into the app's `models` folder. Keep it open until it reports **both models ready**. This needs internet and several GB of free space (including temporary extraction space). The Greek model is roughly 1.1 GB and English small model roughly 40 MB. If you skip it or it fails, run `BadWordBeep-Models.exe` from `%LOCALAPPDATA%\BadWordBeep` later. The installer does not silently install the models; downloading is optional at setup and required before starting censoring. Model archives come from the [official Vosk model catalog](https://alphacephei.com/vosk/models).
-4. Open **Bad Word Beep** from Start. Choose the microphone by its full name, then choose **CABLE Input (VB-Audio Virtual Cable)** as *Playback output*. Select a device entry whose default sample rate matches the selected mic and accepts mono. Device numbers differ between PCs and can change after driver changes.
-5. In OBS, add **Audio Input Capture** with **CABLE Output (VB-Audio Virtual Cable)**. Mute/remove *every* raw microphone route (scene sources, **Settings → Audio → Mic/Aux**, webcams, Sonar/fifine mixers carrying the original voice), otherwise uncensored audio can leak into the stream. CABLE Input is the playback side the app sends to; CABLE Output is the recording side OBS receives.
-6. Click **Start censor** and wait for **Running**. Click **Start Recording** in OBS—not Start Streaming. Speak normal speech and Greek/English words from `bad_words.txt`. Wait *longer than the configured delay* after the last word before stopping the recording. Listen to the actual file to check voice, beeps, leaks and synchronization. OBS video, game audio and RTMP phone audio are **not** delayed automatically; a six-second mic delay will put audio out of sync unless other sources are aligned appropriately.
-7. Click **Stop** in the app when finished. Closing the window stops the censor. The app's `settings.json` remembers your settings and selected device descriptions.
+### What users need
+
+- `BadWordBeep-Setup.exe` from this project's GitHub Release.
+- [VB-CABLE](https://vb-audio.com/Cable/), installed separately.
+- [OBS Studio](https://obsproject.com/download), if you want to use the app with OBS.
+- Internet access and several GB of free disk space for the Vosk models.
+
+End users do **not** need Python, Inno Setup, the source files, or the GitHub “Source code (zip)” archive.
+
+### Windows SmartScreen warning
+
+This first installer is **not code-signed**. Windows may display:
+
+> Windows protected your PC  
+> Microsoft Defender SmartScreen prevented an unrecognized app from starting.  
+> App: BadWordBeep-Setup.exe  
+> Publisher: Unknown publisher
+
+This means Windows cannot verify the publisher of the EXE and has not established reputation for this new download. The warning does not by itself prove that the file is malicious, but it is not a safety guarantee either.
+
+Only continue if you intentionally downloaded `BadWordBeep-Setup.exe` from this project's official GitHub Release and trust the project. Verify the filename and download location. If anything looks unexpected, cancel the launch.
+
+If you choose to continue, click **More info → Run anyway**. Do not disable SmartScreen for your entire computer. Future unsigned builds may show the same warning. Code signing and Microsoft Store distribution are possible future improvements, but signing alone does not guarantee immediate removal of SmartScreen warnings.
+
+### Installation
+
+1. Download `BadWordBeep-Setup.exe` from the GitHub Release assets.
+2. Install [VB-CABLE](https://vb-audio.com/Cable/) using the vendor's Windows instructions. This installer does **not** install VB-CABLE. A reboot may be required.
+3. Install [OBS Studio](https://obsproject.com/download) if needed.
+4. Run `BadWordBeep-Setup.exe`. It installs the app for your Windows user and creates a Start-menu shortcut. A desktop shortcut is optional.
+5. At the end of setup, select **Download Greek and English Vosk models**. Keep the console window open until it reports that both models are ready.
+6. The model download requires internet and several GB of free space, including temporary extraction space. The Greek model download is roughly 1.1 GB and the English small model roughly 40 MB; extracted files require additional space. The model archives come from the [official Vosk model catalog](https://alphacephei.com/vosk/models).
+7. If model setup is skipped or fails, run `BadWordBeep-Models.exe` from `%LOCALAPPDATA%\BadWordBeep` later. Censoring cannot start until the required models are installed.
+
+## Configure the app
+
+1. Open **Bad Word Beep** from the Start menu.
+2. Select your microphone by its full device name.
+3. Select **CABLE Input (VB-Audio Virtual Cable)** as **Playback output**.
+4. Choose a device entry whose default sample rate matches the microphone and supports mono. Device numbers can differ between PCs or change after driver updates.
+
+## Configure OBS
+
+1. Add an **Audio Input Capture** source in OBS.
+2. Select **CABLE Output (VB-Audio Virtual Cable)** as the device.
+3. Mute or remove every raw microphone route, including:
+   - OBS `Settings → Audio → Mic/Aux`.
+   - A webcam microphone.
+   - Scene sources containing the original microphone.
+   - Sonar, Fifine, mixers, or other applications carrying the original voice.
+4. Keep only the processed CABLE route active. Otherwise, uncensored audio can leak into the stream.
+
+**Routing terminology:** The app sends audio to `CABLE Input`; OBS receives it from `CABLE Output`.
+
+## Test before streaming
+
+1. Start the app and click **Start censor**. Wait until its status says **Running**.
+2. In OBS, click **Start Recording**, not **Start Streaming**.
+3. Speak normal speech and test Greek and English words from `bad_words.txt`.
+4. Wait longer than the configured delay after the last word before stopping the recording.
+5. Listen to the actual recording. Check voice, beeps, synchronization, background audio, and possible raw-microphone leaks.
+6. Stop the app when finished. Closing its window also stops censoring.
+
+The default delay is six seconds. OBS video, game audio, and other audio sources are not delayed automatically, so the microphone may be out of sync unless those sources are aligned separately.
 
 ## Controls and logs
 
-| Item | What it does |
+| Item | Description |
 | --- | --- |
-| Delay (default 6 seconds) | Holds mic audio to allow recognition; longer is not a guarantee if processing falls behind. |
-| Beep volume (default `0.04`) | Try `0.02` for quieter beeps or `0` to silence matched words. |
-| Open word list | Opens `bad_words.txt` next to the installed EXE. One word per line, UTF-8. `#` starts a comment. Accents/case are ignored; add inflected and plural forms separately. Stop and restart censoring after changes. |
-| Mute unanalyzed audio | Experimental alternative to passing through unanalyzed audio. Can create gaps and cannot prevent errors or later revisions from either recognizer. Not a true fail-safe. |
-| `PARTIAL HEARD [el/en]` | Interim guess from one language model; may change. |
+| Delay, default 6 seconds | Holds microphone audio while recognition runs. A longer delay is not a guarantee if processing falls behind. |
+| Beep volume, default `0.04` | Try `0.02` for a quieter beep or `0` to silence matched words. |
+| Open word list | Opens `bad_words.txt` beside the installed EXE. Use one UTF-8 word or phrase per line. `#` starts a comment. Accents and case are ignored; add inflected and plural forms separately. Stop and restart censoring after changes. |
+| Mute unanalyzed audio | Experimental. May create gaps and is not a fail-safe. |
+| `PARTIAL HEARD [el/en]` | Interim recognition that may change. |
 | `HEARD [el/en]` | Final transcript after an utterance boundary. |
-| `BEEP [el/en]` | Word marked for beeping at an estimated time. Duplicate lines can refer to overlapping model reports. Check the recording. |
-| `PARTIAL` / `TOO LATE` | Some/all of the detected word already played before it was marked. |
-| `STATUS: lag el=... en=...` | Recognizer backlog; persistent growth means the PC cannot keep up. `unanalyzed passed` means audio went to OBS before both models had processed it. `muted` shows gaps in experimental mute mode. |
+| `BEEP [el/en]` | A word was marked for beeping at an estimated time. Duplicate lines may refer to overlapping model reports. |
+| `PARTIAL` / `TOO LATE` | Some or all of the detected word played before it was marked. |
+| `STATUS: lag el=... en=...` | Recognizer backlog. Persistent growth means the PC may not keep up. |
 
-Two simultaneous language recognizers can falsely detect an English word during Greek speech or vice versa. The Vosk publisher describes its Greek model as not extremely accurate. The sample recording previously tested in this project looked promising, but results vary. [Vosk model list](https://alphacephei.com/vosk/models)
+Both language recognizers process all microphone audio. They can falsely identify an English word during Greek speech or a Greek word during English speech. Results vary by PC, microphone, language, pronunciation, and background noise.
+
+## Troubleshooting
+
+### The app will not start and mentions `_internal\\vosk`
+
+This usually means an old broken build was installed. Rebuild with the corrected `build_windows.ps1`, confirm that `dist\BadWordBeep\_internal\vosk\libvosk.dll` exists, and install the newly generated setup EXE.
+
+### Models are missing
+
+Run the installed `BadWordBeep-Models.exe` again. Each model directory should contain `am\final.mdl`. If a model folder is incomplete, back it up or remove it before retrying.
+
+### OBS receives no audio
+
+Confirm that the app uses the microphone by name, the app output is `CABLE Input`, OBS input is `CABLE Output`, and you waited for the configured delay. Check the OBS mixer and the recorded file.
+
+### An uncensored word is audible
+
+Check that no raw microphone route reaches OBS. Also inspect the app log for `TOO LATE`, `PARTIAL`, recognizer backlog, or a spelling mismatch in `bad_words.txt`. The app cannot guarantee that every word will be censored.
+
+### The beep is too loud or the wrong words beep
+
+Lower the beep volume. Both language models process all microphone audio, so false matches are possible. Edit the word list carefully and confirm changes with a recording.
 
 ## Build the Windows installer
 
-For contributors: put the following **source files** together in a fresh Windows project folder:
+These instructions are for contributors or the project owner. End users should download the release installer instead.
+
+### Source files
 
 ```text
 app.py
@@ -49,37 +130,40 @@ README.md
 .gitignore
 ```
 
-The **current `build_windows.ps1` must bundle `vosk/libvosk.dll`** into the GUI. Do **not** use the earlier build script that omitted it (the installed app crashed before opening), nor the first hotfix that incorrectly searched `.venv\vosk`. The corrected builder discovers the installed Vosk package with `importlib.util.find_spec('vosk')`, passes `--add-binary "${voskDll}:vosk"` to PyInstaller, and refuses to package the installer unless `dist\BadWordBeep\_internal\vosk\libvosk.dll` exists. [PyInstaller usage](https://pyinstaller.org/en/stable/usage.html)
+The current `build_windows.ps1` must bundle `vosk/libvosk.dll` into the GUI. The corrected builder discovers the installed Vosk package with `importlib.util.find_spec('vosk')`, passes `--add-binary "${voskDll}:vosk"` to PyInstaller, and refuses to package the installer unless `dist\BadWordBeep\_internal\vosk\libvosk.dll` exists.
 
-1. Install [Python for Windows](https://www.python.org/downloads/) and [Inno Setup](https://jrsoftware.org/isdl.php) **on the build machine**. The finished installer does not require them on an end-user machine. Check that your source folder contains the *corrected* builder named `build_windows.ps1`.
-2. Double-click **`BUILD_WINDOWS.cmd`** and wait for the last line confirming `release\BadWordBeep-Setup.exe`. It creates/reuses `.venv`, installs `numpy`, `scipy`, `sounddevice`, `vosk`, `pyinstaller`, bundles a GUI EXE and a separate model-downloader EXE, validates Vosk's DLL path, and compiles the setup file using Inno Setup's `ISCC.exe`. PyInstaller does not cross-compile; build the Windows EXEs on Windows. [PyInstaller manual](https://pyinstaller.org/en/stable/index.html)
-3. Check the result in PowerShell from the source folder:
+### Build steps
+
+1. Install [Python for Windows](https://www.python.org/downloads/) and [Inno Setup](https://jrsoftware.org/isdl.php) on the Windows build machine.
+2. Confirm that the source folder contains the corrected `build_windows.ps1`.
+3. Double-click `BUILD_WINDOWS.cmd` and wait for the final message confirming `release\BadWordBeep-Setup.exe`.
+4. Check the result from PowerShell in the source folder:
 
 ```powershell
 Test-Path ".\dist\BadWordBeep\_internal\vosk\libvosk.dll"
 Test-Path ".\release\BadWordBeep-Setup.exe"
 ```
 
-Both should return `True`. If `ISCC.exe` is installed at `C:\Program Files (x86)\Inno Setup 6\ISCC.exe` but the builder cannot find it, check you are using the corrected script. You can compile the finished portable folder without rerunning pip/PyInstaller using:
+Both commands should return `True`.
+
+If Inno Setup is installed at `C:\Program Files (x86)\Inno Setup 6\ISCC.exe` but the builder cannot find it, use the corrected builder or compile the installer manually:
 
 ```powershell
 & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" ".\installer.iss"
 ```
 
-4. Install the **new** setup EXE on your own Windows machine and test *the installed app*, model download, audio routing, Greek and English recording. Do not publish a build merely because compilation succeeded. `dist\BadWordBeep` is also a portable app folder: keep all files together, not only `BadWordBeep.exe`. The one-file `BadWordBeep-Models.exe` beside it downloads models for that folder.
+PyInstaller builds Windows applications on Windows; it does not cross-compile. Test the newly generated installer, model download, audio routing, and Greek/English recordings before publishing it.
 
-GitHub source releases should contain the source files and README; attach the verified installer as a GitHub Release asset. **Do not put the EXE inside the Git repository**. The model ZIPs are also too large to commit; the model downloader fetches them on each installation. Only run build and install scripts from a source you trust.
+`dist\BadWordBeep` is also a portable app folder. Keep the complete folder together; do not copy only `BadWordBeep.exe`. The `BadWordBeep-Models.exe` beside it downloads models for that portable folder.
 
-## Troubleshooting
-
-- **`FileNotFoundError ... _internal\vosk` at startup:** That is the *old broken build*. Rebuild with the corrected `build_windows.ps1`, confirm `libvosk.dll` exists at the path above, then run the newly generated setup EXE to update the installed app. Running an old installer again will not fix it.
-- **App says models are missing:** Run installed `BadWordBeep-Models.exe` again, or extract both official models so each directory under `models` contains `am\final.mdl`. An existing incomplete model folder is not overwritten automatically; back it up/remove it before retrying.
-- **No OBS audio:** Verify mic by name, select CABLE Input in the app and CABLE Output in OBS, wait for the delay, and check OBS mixer/recording tracks.
-- **A raw word is audible:** Verify no other mic reaches OBS; check `TOO LATE`, `PARTIAL`, backlog and the recognized word spelling in `bad_words.txt`. The app cannot guarantee every word.
-- **Builder says `Missing Vosk DLL: ...\.venv\vosk\libvosk.dll`:** This is the *outdated hotfix*, not a missing pip package. Replace `build_windows.ps1` with the corrected one; the package actually lives under `.venv\Lib\site-packages\vosk` on the tested Windows machine.
-- **Builder cannot find Inno Setup:** Install the official compiler. A successful PyInstaller build alone yields the portable folder but *not* the new setup EXE. Rerun the corrected build or call `ISCC.exe` as shown above once the correct portable folder exists.
-- **Beep too loud:** Lower beep volume. **Wrong words beeped:** both models process all mic audio, including speech in the other language; edit the list carefully and confirm results with a recording.
+Attach the verified `BadWordBeep-Setup.exe` as a GitHub Release asset. Do not commit the EXE or large Vosk model archives to the source repository.
 
 ## Privacy and files
 
-The app processes speech on the local PC after both Vosk models are installed. It displays transcripts in its log, writes `settings.json` beside the installed app EXE and stores editable `bad_words.txt` there. OBS recordings can contain private speech. The source code does not intentionally upload audio. VB-CABLE and OBS have their own installation/licensing requirements; consult their vendors before redistributing anything besides your own app.
+After the models are installed, speech recognition runs locally on the PC. The app displays transcripts in its log, stores `settings.json` beside the installed app EXE, and keeps an editable `bad_words.txt` there. OBS recordings may contain private speech. This source does not intentionally upload microphone audio.
+
+VB-CABLE and OBS have their own installation, licensing, and privacy requirements. Consult their vendors before redistributing anything other than this project's own files.
+
+## License
+
+No open-source license has currently been included. Unless a license is added, the project remains under the author's default copyright rights. Do not reuse, redistribute, or modify the source as though it were public-domain software.
