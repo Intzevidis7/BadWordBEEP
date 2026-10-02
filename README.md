@@ -2,7 +2,7 @@
 
 A **local, experimental** microphone censor for Windows and OBS. The desktop app runs two Vosk recognizers—Greek and English—against the same microphone input. Words listed in `bad_words.txt` are replaced with a beep in a delayed audio feed sent through VB-CABLE to OBS.
 
-The app runs on CPU. It does not require an AMD/NVIDIA GPU, a cloud transcription account, or intentional audio uploads. Transcripts appear in the app log.
+The app runs on CPU. It does not require an AMD/NVIDIA GPU or a cloud transcription account. The app does not intentionally upload microphone audio. Transcripts appear in the app log.
 
 > **Important:** This is not a guaranteed profanity filter. It can miss words, beep innocent speech, or recognize a word after it has already played. Always test with a local OBS recording before streaming.
 
@@ -51,13 +51,11 @@ If you choose to continue, click **More info → Run anyway**. Do not disable Sm
 
 ## Configure OBS
 
+**Only the microphone is delayed by this app.** It does not delay the entire OBS scene or automatically synchronize webcam video, game video, game sound, or other sources. OBS Stream Delay postpones the finished stream for viewers, but does **not** fix a mismatch between sources inside that stream. To synchronize the scene, the user must delay earlier video and other audio sources separately by the measured amount. This can require multiple settings or extra tools and may not be practical for every setup; check a local recording before going live.
+
 1. Add an **Audio Input Capture** source in OBS.
 2. Select **CABLE Output (VB-Audio Virtual Cable)** as the device.
-3. Mute or remove every raw microphone route, including:
-   - OBS `Settings → Audio → Mic/Aux`.
-   - A webcam microphone.
-   - Scene sources containing the original microphone.
-   - Sonar, Fifine, mixers, or other applications carrying the original voice.
+3. Mute or remove every raw microphone route, including OBS `Settings → Audio → Mic/Aux`, webcam microphones, scene sources with the original mic, and Sonar/Fifine/mixer routes that carry it.
 4. Keep only the processed CABLE route active. Otherwise, uncensored audio can leak into the stream.
 
 **Routing terminology:** The app sends audio to `CABLE Input`; OBS receives it from `CABLE Output`.
@@ -71,15 +69,15 @@ If you choose to continue, click **More info → Run anyway**. Do not disable Sm
 5. Listen to the actual recording. Check voice, beeps, synchronization, background audio, and possible raw-microphone leaks.
 6. Stop the app when finished. Closing its window also stops censoring.
 
-The default delay is six seconds. OBS video, game audio, and other audio sources are not delayed automatically, so the microphone may be out of sync unless those sources are aligned separately.
+The default microphone delay is six seconds. Changing it does not change an OBS delay or synchronize the scene. **Do not set OBS Stream Delay to six seconds expecting it to correct lip-sync**: that delays the already-combined output, leaving the microphone six seconds behind an undelayed picture. Align the other sources separately and verify the recording.
 
 ## Controls and logs
 
 | Item | Description |
 | --- | --- |
-| Delay, default 6 seconds | Holds microphone audio while recognition runs. A longer delay is not a guarantee if processing falls behind. |
+| Delay, default 6 seconds | Holds only microphone audio while recognition runs. It does not delay the scene or synchronize other sources. A longer delay is not a guarantee if processing falls behind. |
 | Beep volume, default `0.04` | Try `0.02` for a quieter beep or `0` to silence matched words. |
-| Open word list | Opens `bad_words.txt` beside the installed EXE. Use one UTF-8 word or phrase per line. `#` starts a comment. Accents and case are ignored; add inflected and plural forms separately. Stop and restart censoring after changes. |
+| Open word list | Opens `bad_words.txt` beside the installed EXE. Use one UTF-8 entry per line. `#` starts a comment. Accents and case are ignored; add inflected and plural forms separately. Stop and restart censoring after changes. |
 | Mute unanalyzed audio | Experimental. May create gaps and is not a fail-safe. |
 | `PARTIAL HEARD [el/en]` | Interim recognition that may change. |
 | `HEARD [el/en]` | Final transcript after an utterance boundary. |
@@ -91,7 +89,7 @@ Both language recognizers process all microphone audio. They can falsely identif
 
 ## Troubleshooting
 
-### The app will not start and mentions `_internal\\vosk`
+### The app will not start and mentions `_internal\vosk`
 
 This usually means an old broken build was installed. Rebuild with the corrected `build_windows.ps1`, confirm that `dist\BadWordBeep\_internal\vosk\libvosk.dll` exists, and install the newly generated setup EXE.
 
@@ -102,6 +100,10 @@ Run the installed `BadWordBeep-Models.exe` again. Each model directory should co
 ### OBS receives no audio
 
 Confirm that the app uses the microphone by name, the app output is `CABLE Input`, OBS input is `CABLE Output`, and you waited for the configured delay. Check the OBS mixer and the recorded file.
+
+### Voice does not match video or game audio
+
+This app delays only the microphone. OBS Stream Delay will not repair the mismatch. Other video/audio sources need their own appropriate delays; measure and verify them in a local recording. Some setups may need additional software or hardware to delay all sources reliably.
 
 ### An uncensored word is audible
 
