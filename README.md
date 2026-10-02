@@ -60,61 +60,6 @@ If you choose to continue, click **More info → Run anyway**. Do not disable Sm
 
 **Routing terminology:** The app sends audio to `CABLE Input`; OBS receives it from `CABLE Output`.
 
-## Match video and other audio to the microphone
-
-The app delays the processed microphone, not the OBS scene. If you choose
-a six-second delay in the app, your voice can reach OBS about six seconds
-after you speak. The webcam picture and game sound may arrive earlier.
-
-**OBS Stream Delay does not fix this.** It delays the completed stream
-after OBS has combined its sources, so any voice/video mismatch remains.
-
-### Start with a sync test
-
-1. Set the delay you intend to use in Bad Word Beep and start censoring.
-2. Start a local OBS recording.
-3. Clap visibly in front of your camera while speaking a short word.
-   If you also use game audio, trigger an obvious game sound or action.
-4. Stop the recording after waiting longer than the app's delay.
-5. Watch the recording. Measure how far the picture and other sounds
-   occur before your processed voice. Use that *measured difference*,
-   rather than assuming it is exactly the app's configured delay.
-
-### Delay video that appears too early
-
-1. In OBS, right-click the webcam or video source and choose **Filters**.
-2. Under **Effect Filters**, click **+ → Render Delay**.
-3. Enter the needed delay in milliseconds: 1 second = 1,000 ms.
-4. Make another short recording and adjust until a visible clap matches
-   the sound of your clap in the processed microphone.
-
-OBS's built-in Render Delay has a 500 ms limit per filter in the OBS
-versions documented here. You can stack filters, but a six-second delay
-would take twelve 500 ms filters on a video source and could consume
-significant memory. Test OBS performance before streaming. If your OBS
-version or setup cannot handle this reliably, do not assume the scene
-is synchronized.
-
-### Delay other audio that arrives too early
-
-1. In OBS, open the **Audio Mixer** menu and select
-   **Advanced Audio Properties**.
-2. Find an *earlier* source, such as Desktop Audio or a separate game
-   audio source. Set its **Sync Offset** to the measured delay in
-   milliseconds.
-3. Leave the processed `CABLE Output` microphone at its normal offset
-   unless a recording shows that it needs a small correction.
-4. Repeat for each audio source that must line up with the microphone.
-
-Do not apply the same delay blindly to every source. A phone/RTMP camera
-feed, capture card, browser source, or game source may already have its
-own latency. Measure each one in the **recorded output**. Source delays
-may also affect what you hear while monitoring; check the result.
-
-If you change the delay in Bad Word Beep, repeat the sync test and
-readjust OBS. If the app's processing lag changes during use, a fixed
-OBS offset may not keep everything synchronized.
-
 ## Test before streaming
 
 1. Start the app and click **Start censor**. Wait until its status says **Running**.

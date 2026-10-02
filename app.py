@@ -1,4 +1,3 @@
-"""Local GUI entry point; build this file with PyInstaller for Windows."""
 """Modernized Tkinter GUI for Bad Word Beep."""
 import json
 import queue
@@ -29,6 +28,14 @@ class GUI:
     def __init__(self, root):
         self.root = root
         root.title('Bad Word Beep')
+        try:
+            root.iconbitmap(
+                sys.executable
+                if getattr(sys, 'frozen', False)
+                else str(ROOT / 'app.ico')
+            )
+        except tk.TclError:
+            pass
         root.geometry('1000x760')
         root.minsize(820, 620)
         root.configure(bg=BG)

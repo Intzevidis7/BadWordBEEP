@@ -20,7 +20,11 @@ if ($LASTEXITCODE -ne 0 -or -not $voskDir -or -not (Test-Path -LiteralPath $vosk
 $voskDll = Join-Path $voskDir 'libvosk.dll'
 if (-not (Test-Path -LiteralPath $voskDll)) { throw "Missing Vosk DLL: $voskDll" }
 Write-Host "Bundling Vosk DLL: $voskDll"
-& $python -m PyInstaller --clean --noconfirm --onedir --windowed --name BadWordBeep --add-binary "${voskDll}:vosk" app.py
+& $python -m PyInstaller --clean --noconfirm --onedir --windowed `
+    --name BadWordBeep `
+    --icon "$PSScriptRoot\app.ico" `
+    --add-binary "${voskDll}:vosk" `
+    app.py
 if ($LASTEXITCODE -ne 0) { throw 'GUI build failed.' }
 $bundledDll = Join-Path $PSScriptRoot 'dist\BadWordBeep\_internal\vosk\libvosk.dll'
 if (-not (Test-Path -LiteralPath $bundledDll)) { throw "Bundled DLL not found: $bundledDll" }

@@ -6,6 +6,7 @@ AppId={{BFF6E520-69C9-4986-85EE-7D00F111C69D}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 DefaultDirName={localappdata}\BadWordBeep
+SetupIconFile=app.ico
 DefaultGroupName={#MyAppName}
 OutputDir=release
 OutputBaseFilename=BadWordBeep-Setup
