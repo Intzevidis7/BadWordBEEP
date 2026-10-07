@@ -32,6 +32,27 @@ Only continue if you intentionally downloaded `BadWordBeep-Setup.exe` from this 
 
 If you choose to continue, click **More info → Run anyway**. Do not disable SmartScreen for your entire computer. Future unsigned builds may show the same warning. Code signing and Microsoft Store distribution are possible future improvements, but signing alone does not guarantee immediate removal of SmartScreen warnings.
 
+
+### v0.3 recognition modes
+
+Version 0.3 adds three recognition modes:
+
+- **Greek only — fastest for Greek streams:** loads the Greek Vosk model and uses `bad_words_el.txt` plus `bad_words_greeklish.txt`.
+- **English only — fastest for English streams:** loads the English Vosk model and uses `bad_words_en.txt`.
+- **Greek + English — mixed speech, higher CPU use:** loads both recognizers and uses all three language lists.
+
+For Greek-focused streams, use **Greek only** to avoid loading the English recognizer. Greek + English mode uses substantially more memory because it runs two offline recognizers.
+
+The language lists are editable UTF-8 files next to the installed application:
+
+```text
+bad_words_el.txt
+bad_words_en.txt
+bad_words_greeklish.txt
+```
+
+Stop and restart censoring after editing a list. The legacy `bad_words.txt` remains included for compatibility with older builds, but v0.3 uses the language-specific lists according to the selected mode.
+
 ### Installation
 
 1. Download `BadWordBeep-Setup.exe` from the GitHub Release assets.
@@ -124,6 +145,9 @@ app.py
 censor_engine.py
 models_setup.py
 bad_words.txt
+bad_words_el.txt
+bad_words_en.txt
+bad_words_greeklish.txt
 requirements-build.txt
 installer.iss
 build_windows.ps1
