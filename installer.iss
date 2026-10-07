@@ -1,5 +1,5 @@
 #define MyAppName "Bad Word Beep"
-#define MyAppVersion "0.1.0"
+#define MyAppVersion "0.3.0"
 
 [Setup]
 AppId={{BFF6E520-69C9-4986-85EE-7D00F111C69D}
@@ -27,5 +27,5 @@ Name: "{autodesktop}\Bad Word Beep"; Filename: "{app}\BadWordBeep.exe"; Tasks: d
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Shortcuts:"
 
 [Run]
-Filename: "{app}\BadWordBeep-Models.exe"; Description: "Download Greek and English Vosk models (internet required, ~1.1 GB + extraction)"; Flags: postinstall skipifsilent
+Filename: "{app}\BadWordBeep-Models.exe"; Description: "Download Greek and English Vosk models (internet required; several GB of free disk space recommended)"; Flags: postinstall skipifsilent
 Filename: "{app}\BadWordBeep.exe"; Description: "Open Bad Word Beep"; Flags: postinstall nowait skipifsilent unchecked

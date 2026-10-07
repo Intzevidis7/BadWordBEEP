@@ -1,0 +1,11 @@
+# Greeklish entries: Greek words written with Latin letters.
+# Add the spellings used by your stream/community.
+malaka
+malakas
+malakia
+skata
+poustis
+pousti
+gamo
+gamisou
+vlaka

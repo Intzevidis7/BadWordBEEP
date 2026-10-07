@@ -1,17 +1,7 @@
-# One normalized exact word per line; edit to your stream rules.
-# Greek accents/capitalization ignored; plurals and inflections require separate entries.
-fuck
-fucking
-fucked
-fucker
-fuckers
-shit
-bitch
-bitches
-asshole
-assholes
-bastard
-cunt
+# Legacy combined list retained for compatibility with older versions.
+# v0.3 uses bad_words_el.txt, bad_words_en.txt, and bad_words_greeklish.txt.
+# Greek script words and phrases. One entry per line.
+# Accents and case are ignored. Add inflected forms separately.
 μαλάκας
 μαλάκα
 μαλάκες
@@ -27,3 +17,29 @@ cunt
 γαμμί
 κουράδες
 βλάκα
+
+# English words and phrases. One entry per line.
+fuck
+fucking
+fucked
+fucker
+fuckers
+shit
+bitch
+bitches
+asshole
+assholes
+bastard
+cunt
+
+# Greeklish entries: Greek words written with Latin letters.
+# Add the spellings used by your stream/community.
+malaka
+malakas
+malakia
+skata
+poustis
+pousti
+gamo
+gamisou
+vlaka

@@ -1,0 +1,17 @@
+# Greek script words and phrases. One entry per line.
+# Accents and case are ignored. Add inflected forms separately.
+μαλάκας
+μαλάκα
+μαλάκες
+μαλακία
+μαλακίες
+σκατά
+πούστης
+πούστη
+γαμώ
+γαμό
+γαμήσου
+γαμί
+γαμμί
+κουράδες
+βλάκα
