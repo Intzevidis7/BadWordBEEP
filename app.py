@@ -179,7 +179,6 @@ class GUI:
             'Third-party components retain their own licenses.',
             parent=self.root,
         )
-#⠀⠀⠀⠀⠀⠀
     def active_lists(self):
         mode=MODES[self.mode_label.get()]
         if mode=='el': return [ROOT/'bad_words_el.txt', ROOT/'bad_words_greeklish.txt']
