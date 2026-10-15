@@ -6,6 +6,10 @@
 #   Created by Intzevidis7
 #   GitHub: https://github.com/Intzevidis7
 #
+#   © 2026 Intzevidis7. All rights reserved.
+#   Unauthorized copying, modification, redistribution, or reuse of the
+#   source code is prohibited.
+#
 #   "Every beep is a tiny piece of performance art."
 #
 # ============================================================
