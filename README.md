@@ -13,7 +13,7 @@ The app runs on CPU. It does not require an AMD/NVIDIA GPU or a cloud transcript
 - `BadWordBeep-Setup.exe` from this project's GitHub Release.
 - [VB-CABLE](https://vb-audio.com/Cable/), installed separately.
 - [OBS Studio](https://obsproject.com/download), if you want to use the app with OBS.
-- Internet access and several GB of free disk space for the Vosk models.
+- Internet access for the first-time Vosk model download and several GB of free disk space.
 
 End users do **not** need Python, Inno Setup, the source files, or the GitHub “Source code (zip)” archive.
 
@@ -186,7 +186,8 @@ Attach the verified `BadWordBeep-Setup.exe` as a GitHub Release asset. Do not co
 
 ## Files
 
-After the models are installed, speech recognition runs locally on the PC. The app displays transcripts in its log, stores `settings.json` beside the installed app EXE, and keeps an editable `bad_words.txt` there. OBS recordings may contain private speech. This source does not intentionally upload microphone audio.
+Speech recognition runs locally after the required Vosk models are installed.
+The app displays transcripts in its log, stores `settings.json` beside the installed app EXE, and keeps editable bad-word lists there. OBS recordings may contain private speech. The app displays transcripts in its log, stores `settings.json` beside the installed app EXE, and keeps an editable `bad_words.txt` there. OBS recordings may contain private speech. This source does not intentionally upload microphone audio.
 
 ## Speech recognition and privacy
 
