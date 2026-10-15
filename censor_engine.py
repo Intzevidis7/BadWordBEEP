@@ -1,4 +1,10 @@
-"""Bad Word Beep v0.3: selectable Vosk-language delayed microphone censor."""
+# ============================================================
+#  Bad Word Beep — censor engine
+#  Created by Intzevidis7
+#  GitHub: https://github.com/Intzevidis7
+#
+#  "The beep is not censorship; it is dramatic timing."
+# ============================================================
 import json
 import math
 import queue

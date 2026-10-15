@@ -1,9 +1,20 @@
-"""Bad Word Beep v0.3 GUI."""
+# ============================================================
+#
+#   I N T Z E V I D I S 7
+#
+#   Bad Word Beep — local OBS microphone censor
+#   Created by Intzevidis7
+#   GitHub: https://github.com/Intzevidis7
+#
+#   "Every beep is a tiny piece of performance art."
+#
+# ============================================================
 import json
 import queue
 import re
 import sys
 import threading
+import webbrowser
 import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, scrolledtext, ttk
@@ -68,7 +79,29 @@ class GUI:
         outer = ttk.Frame(self.root, padding=28, style='App.TFrame'); outer.pack(fill='both', expand=True)
         header = ttk.Frame(outer, style='App.TFrame'); header.pack(fill='x', pady=(0, 18))
         ttk.Label(header, text='Bad Word Beep', style='Title.TLabel').pack(anchor='w')
-        ttk.Label(header, text='Local Greek + English microphone censor for OBS', style='Subtitle.TLabel').pack(anchor='w', pady=(2, 0))
+        ttk.Label(
+            header,
+            text='Local Greek + English microphone censor for OBS',
+            style='Subtitle.TLabel',
+        ).pack(anchor='w', pady=(2, 0))
+        ttk.Style(self.root).configure(
+            'AuthorLink.TLabel',
+            background=BG,
+            foreground=ACCENT,
+            font=('Segoe UI', 9, 'underline'),
+        )
+
+        github_label = ttk.Label(
+            header,
+            text='Created by Intzevidis7',
+            style='AuthorLink.TLabel',
+            cursor='hand2',
+        )
+        github_label.pack(anchor='w', pady=(4, 0))
+        github_label.bind(
+            '<Button-1>',
+            lambda event: webbrowser.open_new('https://github.com/Intzevidis7'),
+        )
         ttk.Label(header, text='Experimental protection — always test a local recording before streaming.', style='Hint.TLabel').pack(anchor='w', pady=(8, 0))
         route = ttk.LabelFrame(outer, text='  1  Audio routing  ', padding=18, style='Card.TLabelframe'); route.pack(fill='x', pady=(0, 14)); route.columnconfigure(1, weight=1)
         ttk.Label(route, text='Microphone').grid(row=0, column=0, sticky='w', pady=6)
