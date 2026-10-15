@@ -1,10 +1,23 @@
 # Bad Word Beep — Greek + English
 
-A **local, experimental** microphone censor for Windows and OBS. The desktop app runs two Vosk recognizers—Greek and English—against the same microphone input. Words listed in `bad_words.txt` are replaced with a beep in a delayed audio feed sent through VB-CABLE to OBS.
+A local, experimental microphone censor for Windows and OBS, created by
+[Intzevidis7](https://github.com/Intzevidis7).
 
-The app runs on CPU. It does not require an AMD/NVIDIA GPU or a cloud transcription account. The app does not intentionally upload microphone audio. Transcripts appear in the app log.
+The app uses offline Vosk speech recognition to detect configured words and
+replace matched speech with a beep in a delayed microphone feed sent through
+VB-CABLE to OBS.
 
-> **Important:** This is not a guaranteed profanity filter. It can miss words, beep innocent speech, or recognize a word after it has already played. Always test with a local OBS recording before streaming.
+Version 0.3.0 provides three recognition modes: Greek only, English only,
+and Greek + English. Only the recognizers required by the selected mode are
+loaded. Editable language-specific word lists control targeted words and phrases.
+
+The app runs on CPU. It does not require an AMD/NVIDIA GPU or a cloud
+transcription account. Microphone audio is processed locally, and recognition
+transcripts appear in the app log.
+
+> Important: This is not a guaranteed profanity filter. It can miss words,
+> beep innocent speech, or recognize a word after it has already played.
+> Always test with a local OBS recording before streaming.
 
 ## Quick start
 
@@ -85,7 +98,10 @@ Stop and restart censoring after editing a list. The legacy `bad_words.txt` rema
 
 1. Start the app and click **Start censor**. Wait until its status says **Running**.
 2. In OBS, click **Start Recording**, not **Start Streaming**.
-3. Speak normal speech and test Greek and English words from `bad_words.txt`.
+3. Speak normal speech and test words from the lists active in your selected mode:
+   - Greek only: `bad_words_el.txt` and `bad_words_greeklish.txt`
+   - English only: `bad_words_en.txt`
+   - Greek + English: all three language-specific lists
 4. Wait longer than the configured delay after the last word before stopping the recording.
 5. Listen to the actual recording. Check voice, beeps, synchronization, background audio, and possible raw-microphone leaks.
 6. Stop the app when finished. Closing its window also stops censoring.
@@ -98,7 +114,7 @@ The default microphone delay is six seconds. Changing it does not change an OBS 
 | --- | --- |
 | Delay, default 6 seconds | Holds only microphone audio while recognition runs. It does not delay the scene or synchronize other sources. A longer delay is not a guarantee if processing falls behind. |
 | Beep volume, default `0.04` | Try `0.02` for a quieter beep or `0` to silence matched words. |
-| Open word list | Opens `bad_words.txt` beside the installed EXE. Use one UTF-8 entry per line. `#` starts a comment. Accents and case are ignored; add inflected and plural forms separately. Stop and restart censoring after changes. |
+| Open active word list | Opens the language-specific lists used by the selected mode. Use UTF-8 text files with one entry per line. Stop and restart censoring after editing. |
 | Mute unanalyzed audio | Experimental. May create gaps and is not a fail-safe. |
 | `PARTIAL HEARD [el/en]` | Interim recognition that may change. |
 | `HEARD [el/en]` | Final transcript after an utterance boundary. |
@@ -106,7 +122,17 @@ The default microphone delay is six seconds. Changing it does not change an OBS 
 | `PARTIAL` / `TOO LATE` | Some or all of the detected word played before it was marked. |
 | `STATUS: lag el=... en=...` | Recognizer backlog. Persistent growth means the PC may not keep up. |
 
-Both language recognizers process all microphone audio. They can falsely identify an English word during Greek speech or a Greek word during English speech. Results vary by PC, microphone, language, pronunciation, and background noise.
+In single-language mode, only the selected recognizer processes microphone audio.
+In Greek + English mode, both recognizers process the same input, which can
+produce cross-language false matches. Results vary by PC, microphone, language,
+pronunciation, and background noise.
+
+A Greeklish word-list entry is a text-matching entry; it does not add a separate
+Greeklish speech-recognition model.
+
+The updated app also provides an **About / Credits** dialog with the developer
+credit, GitHub link, third-party acknowledgments, and a reference to the release
+license documents.
 
 ## Troubleshooting
 
@@ -128,15 +154,23 @@ This app delays only the microphone. OBS Stream Delay will not repair the mismat
 
 ### An uncensored word is audible
 
-Check that no raw microphone route reaches OBS. Also inspect the app log for `TOO LATE`, `PARTIAL`, recognizer backlog, or a spelling mismatch in `bad_words.txt`. The app cannot guarantee that every word will be censored.
+Check that no raw microphone route reaches OBS. Inspect the app log for
+`TOO LATE`, `PARTIAL`, recognizer backlog, or a mismatch between recognized text
+and an entry in the active language-specific lists. Confirm that the selected
+mode supports the spoken language. Restart censoring after editing a list.
+The app cannot guarantee that every word will be censored.
 
 ### The beep is too loud or the wrong words beep
 
-Lower the beep volume. Both language models process all microphone audio, so false matches are possible. Edit the word list carefully and confirm changes with a recording.
+Lower the beep volume if needed. For primarily Greek or English streams,
+choose the corresponding single-language mode to avoid unnecessary
+cross-language recognition. False matches remain possible in every mode.
+Review the log, edit the active lists carefully, restart censoring, and test
+with a local recording.
 
 ## Build the Windows installer
 
-These instructions are for contributors or the project owner. End users should download the release installer instead.
+These instructions are for the project owner or contributors with explicit permission. End users should download the release installer instead.
 
 ### Source files
 
@@ -153,8 +187,19 @@ installer.iss
 build_windows.ps1
 BUILD_WINDOWS.cmd
 README.md
+app.ico
+LICENSE
+THIRD_PARTY_NOTICES.md
+licenses/
+    VOSK-LICENSE.txt
+    PYTHON-SOUNDDEVICE-LICENSE.txt
 .gitignore
 ```
+
+The build and installer configuration must package all language-specific word
+lists, the application icon, `LICENSE`, `THIRD_PARTY_NOTICES.md`, and the
+applicable third-party license files. Their presence in the source folder
+alone does not confirm inclusion in the installer.
 
 The current `build_windows.ps1` must bundle `vosk/libvosk.dll` into the GUI. The corrected builder discovers the installed Vosk package with `importlib.util.find_spec('vosk')`, passes `--add-binary "${voskDll}:vosk"` to PyInstaller, and refuses to package the installer unless `dist\BadWordBeep\_internal\vosk\libvosk.dll` exists.
 
@@ -186,15 +231,28 @@ Attach the verified `BadWordBeep-Setup.exe` as a GitHub Release asset. Do not co
 
 ## Files
 
-Speech recognition runs locally after the required Vosk models are installed.
-The app displays transcripts in its log, stores `settings.json` beside the installed app EXE, and keeps editable bad-word lists there. OBS recordings may contain private speech. The app displays transcripts in its log, stores `settings.json` beside the installed app EXE, and keeps an editable `bad_words.txt` there. OBS recordings may contain private speech. This source does not intentionally upload microphone audio.
+The installed application folder contains the executable, model setup tool,
+editable word lists, and release documentation.
+
+- `settings.json` stores the saved configuration.
+- `bad_words_el.txt`, `bad_words_en.txt`, and `bad_words_greeklish.txt`
+  contain language-specific matching entries.
+- `bad_words.txt` is retained for older-build compatibility; v0.3.0 uses the
+  language-specific lists.
+- `models/` contains downloaded speech-recognition models.
+- `LICENSE` describes the applicable application license terms.
+- `THIRD_PARTY_NOTICES.md` and `licenses/` contain third-party acknowledgments
+  and license information.
+
+Recognition transcripts appear in the application log. OBS recordings may
+contain private speech; store and share recordings responsibly.
 
 ## Speech recognition and privacy
 
 Bad Word Beep uses [Vosk](https://github.com/alphacep/vosk-api) for local,
 offline speech recognition. Speech-recognition model files are not included in
-this source repository; the Windows installer downloads the selected Vosk
-models from the official Vosk model catalog during setup.
+this source repository; the installer can launch `BadWordBeep-Models.exe`, a separate model setup
+tool that downloads Vosk models from the official model catalog.
 
 Vosk is licensed under the Apache License, Version 2.0. See
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and
@@ -209,10 +267,33 @@ VB-CABLE and OBS have their own installation, licensing, and privacy
 requirements. Consult their vendors before redistributing anything other than
 this project’s own files.
 
-## License
+## Credits
 
-Bad Word Beep source code is released under the MIT License. See
-[`LICENSE`](LICENSE).
+Bad Word Beep was created by [Intzevidis7](https://github.com/Intzevidis7).
+
+© 2026 Intzevidis7. All rights reserved.
+
+Developer and third-party acknowledgments are available in the updated
+application's About / Credits dialog.
+
+## License and permitted use
+
+Current releases are distributed under the custom terms in
+[`LICENSE`](LICENSE), not the MIT License.
+
+The custom license permits users to download and run official, unmodified
+releases for personal and streaming use, including monetized streams.
+
+It does not grant general permission to reuse the source code, publish modified
+versions, redistribute the application, or sell copies. Additional permissions
+require prior written authorization from Intzevidis7.
+
+People wishing to contribute should contact Intzevidis7 before submitting code.
+Source-code contributions require separately agreed contribution terms.
+
+These terms do not revoke permissions already granted for material previously
+distributed under the MIT License.
 
 Third-party components remain subject to their own licenses. See
-[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for details.
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and the applicable license
+files in `licenses/`.

@@ -102,6 +102,11 @@ class GUI:
             cursor='hand2',
         )
         github_label.pack(anchor='w', pady=(4, 0))
+        ttk.Button(
+            header,
+            text='About / Credits',
+            command=self.show_about,
+        ).pack(anchor='w', pady=(6, 0))
         github_label.bind(
             '<Button-1>',
             lambda event: webbrowser.open_new('https://github.com/Intzevidis7'),
@@ -157,7 +162,24 @@ class GUI:
 #           ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣇⡿⠁⠀⠀⠀⠀⠀⠀⢻⣹⡀⢠⣴⡾⠛⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 #           ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⡀⣀⣠⣿⢹⡀⠀⠀⠀⢀⣀⣀⣠⣤⣷⣙⡽⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 #           ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣽⠯⠿⢷⣛⣫⡤⠬⢭⣷⡄⠀⢿⣯⠤⠶⠶⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-#           ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠈⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+#           ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠿⠿⠛⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠈⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    def show_about(self):
+        messagebox.showinfo(
+            'About / Credits — Bad Word Beep',
+            'Bad Word Beep v0.3.0\n'
+            'Created by Intzevidis7\n'
+            '© 2026 Intzevidis7. All rights reserved.\n\n'
+            'GitHub: https://github.com/Intzevidis7\n\n'
+            'Third-party acknowledgments\n'
+            'Vosk — Alpha Cephei\n'
+            'python-sounddevice and PortAudio\n'
+            'Python and Tcl/Tk (Tkinter)\n\n'
+            'See LICENSE, THIRD_PARTY_NOTICES.md, and licenses/ '
+            'included with this release for applicable terms. '
+            'Third-party components retain their own licenses.',
+            parent=self.root,
+        )
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     def active_lists(self):
         mode=MODES[self.mode_label.get()]
         if mode=='el': return [ROOT/'bad_words_el.txt', ROOT/'bad_words_greeklish.txt']
