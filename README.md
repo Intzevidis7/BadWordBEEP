@@ -188,29 +188,30 @@ Attach the verified `BadWordBeep-Setup.exe` as a GitHub Release asset. Do not co
 
 After the models are installed, speech recognition runs locally on the PC. The app displays transcripts in its log, stores `settings.json` beside the installed app EXE, and keeps an editable `bad_words.txt` there. OBS recordings may contain private speech. This source does not intentionally upload microphone audio.
 
-## Speech recognition
+## Speech recognition and privacy
 
 Bad Word Beep uses [Vosk](https://github.com/alphacep/vosk-api) for local,
-offline speech recognition.
-
-Speech-recognition model files are not included in this repository. Download
-the required Vosk model separately from the official
-[Vosk models page](https://alphacephei.com/vosk/models) and place it in the
-application’s configured model directory.
+offline speech recognition. Speech-recognition model files are not included in
+this source repository; the Windows installer downloads the selected Vosk
+models from the official Vosk model catalog during setup.
 
 Vosk is licensed under the Apache License, Version 2.0. See
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) and
 [`licenses/VOSK-LICENSE.txt`](licenses/VOSK-LICENSE.txt) for details.
 
-## Privacy
+Bad Word Beep processes microphone audio locally for speech recognition and
+profanity detection. It does not intentionally upload microphone audio, stream
+recordings, recognition transcripts, or user logs. OBS recordings may contain
+private speech, so users should store and share recordings responsibly.
 
-Bad Word Beep processes audio locally for speech recognition and profanity
-detection. This project does not upload, collect, or distribute microphone
-audio, stream recordings, recognition transcripts, or user logs.
-
-
-VB-CABLE and OBS have their own installation, licensing, and privacy requirements. Consult their vendors before redistributing anything other than this project's own files.
+VB-CABLE and OBS have their own installation, licensing, and privacy
+requirements. Consult their vendors before redistributing anything other than
+this project’s own files.
 
 ## License
 
-No open-source license has currently been included. Unless a license is added, the project remains under the author's default copyright rights. Do not reuse, redistribute, or modify the source as though it were public-domain software.
+Bad Word Beep source code is released under the MIT License. See
+[`LICENSE`](LICENSE).
+
+Third-party components remain subject to their own licenses. See
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for details.
