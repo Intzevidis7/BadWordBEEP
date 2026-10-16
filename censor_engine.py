@@ -19,8 +19,8 @@ from scipy.signal import resample_poly
 from vosk import KaldiRecognizer, Model, SetLogLevel
 
 ASR_RATE = 16000
-AUDIO_WINDOW = 32000
-AUDIO_HOP = 8000
+AUDIO_WINDOW_SECONDS = 2.0
+AUDIO_HOP_SECONDS = 0.25
 AUDIO_BEEP_SECONDS = 0.8
 
 
@@ -86,6 +86,8 @@ class Censor:
         self.audio_threshold = float(audio_threshold)
         self.audio_detector = None
         self.audio_last_accept = {}
+        self.audio_window = round(AUDIO_WINDOW_SECONDS * self.rate)
+        self.audio_hop = round(AUDIO_HOP_SECONDS * self.rate)
         if self.audio_model:
             self.load_audio_model()
 
@@ -105,13 +107,23 @@ class Censor:
             while not self.stopping.is_set():
                 with self.lock:
                     written = self.state['written']
-                    if written < AUDIO_WINDOW:
+                    if written < self.audio_window:
                         window = None
                     else:
-                        positions = np.arange(written - AUDIO_WINDOW, written) % self.capacity
+                        positions = np.arange(written - self.audio_window, written) % self.capacity
                         window = self.audio[positions].copy()
                 if window is None:
                     time.sleep(.05)
+                    continue
+                if self.rate != ASR_RATE:
+                    divisor = math.gcd(self.rate, ASR_RATE)
+                    window = resample_poly(
+                        window,
+                        ASR_RATE // divisor,
+                        self.rate // divisor,
+                    )
+                if len(window) != 32000:
+                    time.sleep(self.audio_hop / self.rate)
                     continue
                 label, score = self.audio_detector.detect(window)
                 if label:
@@ -121,7 +133,7 @@ class Censor:
                         if now - last >= 0.70:
                             self.audio_last_accept[label] = now
                             self.mark_audio(label, now)
-                time.sleep(AUDIO_HOP / self.rate)
+                time.sleep(self.audio_hop / self.rate)
         except Exception as exc:
             self.emit(f'AI audio recognition error: {exc}')
             self.stop()
