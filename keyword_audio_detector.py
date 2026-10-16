@@ -21,7 +21,7 @@ class SpeechHead(torch.nn.Module):
 
     def forward(self, x, mask):
         valid = mask[:, :, 0, :]
-        x = torch.relu(self.project(x[:, 0])) * valid
+        x = torch.relu(self.project(x)) * valid
         x = torch.relu(self.context(x)) * valid
         mean = x.sum(-1) / valid.sum(-1).clamp_min(1)
         maximum = x.masked_fill(valid == 0, -1e9).amax(-1)
@@ -80,6 +80,6 @@ class AudioKeywordDetector:
         negative_probability = float(probabilities[-1])
         best = int(torch.argmax(target_probabilities))
         score = float(target_probabilities[best])
-        if score > negative_probabilities if False else score > negative_probability and score >= self.threshold:
+        if score > negative_probability and score >= self.threshold:
             return LABELS[best], score
         return None, score
