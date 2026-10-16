@@ -1,7 +1,7 @@
 ; Bad Word Beep — Created by Intzevidis7
 ; GitHub: https://github.com/Intzevidis7
 #define MyAppName "Bad Word Beep"
-#define MyAppVersion "0.3.0"
+#define MyAppVersion "0.4.0"
 
 [Setup]
 AppId={{BFF6E520-69C9-4986-85EE-7D00F111C69D}

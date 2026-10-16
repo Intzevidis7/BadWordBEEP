@@ -93,6 +93,12 @@ class GUI:
         header.pack(fill='x', pady=(0, 18))
         ttk.Label(header, text='Bad Word Beep', style='Title.TLabel').pack(anchor='w')
         ttk.Label(header, text='Local Greek + English microphone censor for OBS', style='Subtitle.TLabel').pack(anchor='w', pady=(2, 0))
+        ttk.Style(self.root).configure(
+            'AuthorLink.TLabel',
+            background=BG,
+            foreground=ACCENT,
+            font=('Segoe UI', 9, 'underline'),
+        )
         github_label = ttk.Label(header, text='Created by Intzevidis7', style='AuthorLink.TLabel', cursor='hand2')
         github_label.pack(anchor='w', pady=(4, 0))
         ttk.Button(header, text='About / Credits', command=self.show_about).pack(anchor='w', pady=(6, 0))
@@ -123,7 +129,7 @@ class GUI:
         ttk.Label(settings, text='0–0.3', style='Muted.TLabel').grid(row=1, column=5, sticky='w', pady=(12, 0))
         ttk.Checkbutton(settings, text='Mute unanalyzed audio (experimental gaps)', variable=self.fail_closed).grid(row=2, column=0, columnspan=6, sticky='w', pady=(14, 0))
         ttk.Checkbutton(settings, text='Enable AI audio keyword model (experimental)', variable=self.audio_model).grid(row=3, column=0, columnspan=6, sticky='w', pady=(6, 0))
-        ttk.Label(settings, text='AI audio detection requires models/keyword_v4/model.pt and the XLS-R encoder cache in models/keyword_v4/pretrained/.', style='Muted.TLabel').grid(row=4, column=0, columnspan=6, sticky='w', pady=(6, 0))
+        ttk.Label(settings, text='AI audio detection requires models/keyword_v4/model.pt and downloads XLS-R automatically on the first AI-enabled run.', style='Muted.TLabel').grid(row=4, column=0, columnspan=6, sticky='w', pady=(6, 0))
         ttk.Label(settings, text='Greek + English loads two offline recognizers and may use 1.5 GB+ RAM. Greek-only or English-only mode can reduce resource use.', style='Muted.TLabel').grid(row=5, column=0, columnspan=6, sticky='w', pady=(10, 0))
         actions = ttk.Frame(outer, style='App.TFrame')
         actions.pack(fill='x', pady=(0, 14))
@@ -146,7 +152,7 @@ class GUI:
     def show_about(self):
         messagebox.showinfo(
             'About / Credits — Bad Word Beep',
-            'Bad Word Beep v0.3.0\n'
+            'Bad Word Beep v0.4.0\n'
             'Created by Intzevidis7\n'
             '© 2026 Intzevidis7. All rights reserved.\n\n'
             'GitHub: https://github.com/Intzevidis7\n\n'
