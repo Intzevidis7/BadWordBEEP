@@ -8,13 +8,21 @@ replace matched speech with a beep in a delayed microphone feed sent through
 VB-CABLE to OBS.
 
 Version 0.4.0 adds an optional AI audio keyword model. Vosk remains the main
-Greek and English word-list recognizer; the AI model works alongside it as a
-helper detector for target speech patterns.
+Greek word-list recognizer; the v4 model works alongside it as a helper
+detector for target speech patterns.
 
-Version 0.4.0 provides three Vosk recognition modes: Greek only, English only,
-and Greek + English. Only the Vosk recognizers required by the selected mode
-are loaded. Editable language-specific word lists control targeted words and
-phrases.
+The installer includes your trained v4 checkpoint:
+
+```text
+models/keyword_v4/model.pt
+```
+
+When you enable **Enable AI audio keyword model** for the first time, the app
+automatically downloads the required XLS-R encoder into:
+
+```text
+models/keyword_v4/pretrained/
+```
 
 The app runs on CPU. It does not require an AMD/NVIDIA GPU or a cloud
 transcription account. Microphone audio is processed locally, and recognition
@@ -31,7 +39,7 @@ They analyze the same delayed microphone stream independently.
 
 | System | What it does | When it triggers a beep |
 | --- | --- | --- |
-| Vosk | Converts speech to Greek/English text and matches entries in the active word lists | When a listed word is recognized |
+| Vosk | Converts speech to Greek text and matches entries in the active word lists | When a listed word is recognized |
 | AI audio keyword model | Analyzes 2-second audio windows directly from sound | When a target reaches the configured confidence threshold |
 | Censor engine | Delays microphone audio and inserts the beep | When either Vosk or the AI model detects a target |
 
@@ -50,13 +58,13 @@ only once.
 - [VB-CABLE](https://vb-audio.com/Cable/), installed separately.
 - [OBS Studio](https://obsproject.com/download), if you want to use the app with OBS.
 - Internet access for the first-time Vosk model download and several GB of free disk space.
-- For AI audio detection: the local v4 model file and XLS-R encoder cache described below.
+- Internet access on the first AI-enabled run, so the app can download XLS-R.
 
 End users do **not** need Python, Inno Setup, the source files, or the GitHub “Source code (zip)” archive.
 
 ### Windows SmartScreen warning
 
-This first installer is **not code-signed**. Windows may display:
+This installer is **not code-signed**. Windows may display:
 
 > Windows protected your PC  
 > Microsoft Defender SmartScreen prevented an unrecognized app from starting.  
@@ -67,7 +75,7 @@ This means Windows cannot verify the publisher of the EXE and has not establishe
 
 Only continue if you intentionally downloaded `BadWordBeep-Setup.exe` from this project's official GitHub Release and trust the project. Verify the filename and download location. If anything looks unexpected, cancel the launch.
 
-If you choose to continue, click **More info → Run anyway**. Do not disable SmartScreen for your entire computer. Future unsigned builds may show the same warning. Code signing and Microsoft Store distribution are possible future improvements, but signing alone does not guarantee immediate removal of SmartScreen warnings.
+If you choose to continue, click **More info → Run anyway**. Do not disable SmartScreen for your entire computer.
 
 ### Vosk recognition modes
 
@@ -85,7 +93,7 @@ bad_words_en.txt
 bad_words_greeklish.txt
 ```
 
-Stop and restart censoring after editing a list. The legacy `bad_words.txt` remains included for compatibility with older builds.
+Stop and restart censoring after editing a list.
 
 ## Enable AI audio detection
 
@@ -94,39 +102,22 @@ the selected Vosk recognizer(s).
 
 To enable it:
 
-1. Place the v4 checkpoint at:
-
-```text
-models/keyword_v4/model.pt
-```
-
-2. Place the XLS-R encoder cache in:
-
-```text
-models/keyword_v4/pretrained/
-```
-
-3. Open Bad Word Beep.
-
-4. Select **Enable AI audio keyword model (experimental)**.
-
-5. Click **Start censor**.
+1. Open Bad Word Beep.
+2. Select **Enable AI audio keyword model (experimental)**.
+3. Click **Start censor**.
+4. On the first AI-enabled run, wait while XLS-R downloads automatically.
 
 The detector analyzes a 2-second, 16 kHz mono audio window every 0.25 seconds.
 If your microphone or CABLE device uses 44.1 kHz, the app automatically
 resamples each 2-second window to 16 kHz before classification.
 
 The current default AI confidence threshold is `0.65`. A detected target beeps
-the most recent 0.8 seconds of audio. Repeated detections of the same label are
-suppressed for 0.7 seconds.
+the most recent 0.45 seconds of audio. Repeated detections of the same label
+are suppressed for 0.7 seconds.
 
-AI audio detection requires the following Python packages in the environment
-used to run or build the application:
-
-```text
-torch
-transformers
-```
+AI audio detection requires `torch` and `transformers`. These are included in
+the Windows build requirements; the GUI installer bundles the trained v4
+checkpoint and downloads XLS-R on first AI use.
 
 ## Installation
 
@@ -143,12 +134,12 @@ transformers
 1. Open **Bad Word Beep** from the Start menu.
 2. Select your microphone by its full device name.
 3. Select **CABLE Input (VB-Audio Virtual Cable)** as **Playback output**.
-4. Choose a device entry whose default sample rate matches the microphone and supports mono. Device numbers can differ between PCs or change after driver updates.
-5. Enable **Enable AI audio keyword model** only if the local v4 model and XLS-R cache are present.
+4. Choose a device entry whose default sample rate matches the microphone and supports mono.
+5. Enable **Enable AI audio keyword model** only if you want the optional AI helper detector.
 
 ## Configure OBS
 
-**Only the microphone is delayed by this app.** It does not delay the entire OBS scene or automatically synchronize webcam video, game video, game sound, or other sources. OBS Stream Delay postpones the finished stream for viewers, but does **not** fix a mismatch between sources inside that stream. To synchronize the scene, the user must delay earlier video and other audio sources separately by the measured amount. This can require multiple settings or extra tools and may not be practical for every setup; check a local recording before going live.
+**Only the microphone is delayed by this app.** It does not delay the entire OBS scene or automatically synchronize webcam video, game video, game sound, or other sources.
 
 1. Add an **Audio Input Capture** source in OBS.
 2. Select **CABLE Output (VB-Audio Virtual Cable)** as the device.
@@ -173,18 +164,18 @@ The default microphone delay is six seconds. Changing it does not change an OBS 
 
 | Item | Description |
 | --- | --- |
-| Delay, default 6 seconds | Holds only microphone audio while recognition runs. It does not delay the scene or synchronize other sources. |
+| Delay, default 6 seconds | Holds only microphone audio while recognition runs. |
 | Beep volume, default `0.04` | Try `0.02` for a quieter beep or `0` to silence matched words. |
 | Open active word list | Opens the language-specific lists used by the selected mode. |
 | Mute unanalyzed audio | Experimental. May create gaps and is not a fail-safe. |
 | Enable AI audio keyword model | Optional helper detector that analyzes audio directly alongside Vosk. |
-| `PARTIAL HEARD [el/en]` | Interim Vosk recognition that may change. |
-| `HEARD [el/en]` | Final Vosk transcript after an utterance boundary. |
-| `BEEP [el/en]` | Vosk matched a word in an active list. |
+| `PARTIAL HEARD [el]` | Interim Vosk recognition that may change. |
+| `HEARD [el]` | Final Vosk transcript after an utterance boundary. |
+| `BEEP [el]` | Vosk matched a word in an active list. |
 | `BEEP [audio]` | The AI audio keyword model detected a target above its threshold. |
 | `TOO LATE [audio]` | The AI detection referred to audio that had already been played. |
-| `AI audio recognition error` | The AI model or its audio-window processing failed; check the model files and dependencies. |
-| `STATUS: lag el=... en=...` | Vosk recognizer backlog. Persistent growth means the PC may not keep up. |
+| `AI audio recognition error` | The AI model or its audio-window processing failed. |
+| `STATUS: lag el=...` | Vosk recognizer backlog. Persistent growth means the PC may not keep up. |
 
 False positives are possible with both Vosk and AI audio detection. Review the
 activity log and test with local recordings before streaming.
@@ -195,26 +186,25 @@ activity log and test with local recordings before streaming.
 
 This usually means an old broken build was installed. Rebuild with the corrected `build_windows.ps1`, confirm that `dist\BadWordBeep\_internal\vosk\libvosk.dll` exists, and install the newly generated setup EXE.
 
-### Models are missing
+### Vosk models are missing
 
 Run the installed `BadWordBeep-Models.exe` again. Each Vosk model directory should contain `am\final.mdl`.
 
-### AI audio model is missing
+### XLS-R downloads on first AI use
 
-Confirm that these paths exist:
+This is expected. The first time you enable **Enable AI audio keyword model**, the app downloads the XLS-R encoder into:
 
 ```text
-models/keyword_v4/model.pt
 models/keyword_v4/pretrained/
 ```
 
-The app cannot enable AI audio detection without the v4 checkpoint and XLS-R encoder cache.
+Leave the app and internet connection open until the download finishes.
 
 ### AI audio detection produces errors
 
 Install or update `torch` and `transformers` in the environment used to run the
-application. Confirm that the v4 checkpoint and XLS-R cache are complete and
-that the microphone/CABLE devices use matching default sample rates.
+application. Confirm that `models/keyword_v4/model.pt` exists and that the
+microphone/CABLE devices use matching default sample rates.
 
 ### OBS receives no audio
 
@@ -234,10 +224,7 @@ additional testing.
 
 ### The beep is too loud or the wrong words beep
 
-Lower the beep volume if needed. For primarily Greek or English streams,
-choose the corresponding single-language Vosk mode. False matches remain
-possible in every mode. Review the log, edit the active lists carefully,
-restart censoring, and test with a local recording.
+Lower the beep volume if needed. For primarily Greek streams, choose **Greek only**. False matches remain possible in every mode. Review the log, edit the active lists carefully, restart censoring, and test with a local recording.
 
 ## Build the Windows installer
 
@@ -270,26 +257,33 @@ The build and installer configuration must package all language-specific word
 lists, the application icon, `LICENSE`, `THIRD_PARTY_NOTICES.md`, and the
 applicable third-party license files.
 
-The current `build_windows.ps1` must bundle `vosk/libvosk.dll` into the GUI. The corrected builder discovers the installed Vosk package with `importlib.util.find_spec('vosk')`, passes `--add-binary "${voskDll}:vosk"` to PyInstaller, and refuses to package the installer unless `dist\BadWordBeep\_internal\vosk\libvosk.dll` exists.
+The current `build_windows.ps1` bundles `vosk/libvosk.dll`, includes
+`keyword_audio_detector.py`, collects the required `torch` and `transformers`
+runtime files, and bundles the trained v4 checkpoint at:
+
+```text
+dist/BadWordBeep/models/keyword_v4/model.pt
+```
+
+The large XLS-R encoder is not bundled; it downloads automatically on the first
+AI-enabled run.
 
 ### Build steps
 
 1. Install [Python for Windows](https://www.python.org/downloads/) and [Inno Setup](https://jrsoftware.org/isdl.php) on the Windows build machine.
-2. Install `torch` and `transformers` in the build environment.
-3. Confirm that the source folder contains the corrected `build_windows.ps1`.
-4. Double-click `BUILD_WINDOWS.cmd` and wait for the final message confirming `release\BadWordBeep-Setup.exe`.
-5. Check the result from PowerShell in the source folder:
+2. Run `BUILD_WINDOWS.cmd`.
+3. Wait for the final message confirming `release\BadWordBeep-Setup.exe`.
+4. Check the result from PowerShell in the source folder:
 
 ```powershell
 Test-Path ".\dist\BadWordBeep\_internal\vosk\libvosk.dll"
+Test-Path ".\dist\BadWordBeep\models\keyword_v4\model.pt"
 Test-Path ".\release\BadWordBeep-Setup.exe"
 ```
 
-Both commands should return `True`.
+All three commands should return `True`.
 
-PyInstaller builds Windows applications on Windows; it does not cross-compile. Test the newly generated installer, model download, audio routing, Vosk recognition, AI audio detection, and Greek/English recordings before publishing it.
-
-`dist\BadWordBeep` is also a portable app folder. Keep the complete folder together; do not copy only `BadWordBeep.exe`.
+PyInstaller builds Windows applications on Windows; it does not cross-compile. Test the newly generated installer, model download, audio routing, Vosk recognition, AI audio detection, and Greek recordings before publishing it.
 
 ## Release checklist
 
@@ -298,12 +292,14 @@ Before publishing `v0.4.0`:
 - Merge `feature/audio-keyword-detector` into `main`.
 - Confirm the README documents both Vosk and AI audio detection.
 - Confirm `torch` and `transformers` are included in the build/runtime requirements.
+- Confirm the installer bundles `models/keyword_v4/model.pt`.
+- Confirm XLS-R downloads on the first AI-enabled run.
 - Rebuild the Windows installer.
 - Test a local recording with Vosk only.
 - Test a local recording with Vosk and AI audio detection enabled.
 - Confirm that no raw microphone route reaches OBS.
 - Attach the verified `BadWordBeep-Setup.exe` to the GitHub Release.
-- Do not commit the EXE, v4 checkpoint, or XLS-R model cache to the source repository.
+- Do not commit the EXE or XLS-R cache to the source repository.
 
 ## Files
 
@@ -312,7 +308,8 @@ editable word lists, and release documentation.
 
 - `settings.json` stores the saved configuration.
 - `bad_words_el.txt`, `bad_words_en.txt`, and `bad_words_greeklish.txt` contain language-specific matching entries.
-- `models/` contains downloaded Vosk models and, when installed locally, the AI keyword model files.
+- `models/` contains downloaded Vosk models and, after the first AI-enabled run, the XLS-R encoder cache.
+- `models/keyword_v4/model.pt` is bundled with the installer.
 - `LICENSE` describes the applicable application license terms.
 - `THIRD_PARTY_NOTICES.md` and `licenses/` contain third-party acknowledgments and license information.
 
