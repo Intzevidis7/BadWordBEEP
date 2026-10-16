@@ -21,7 +21,7 @@ from vosk import KaldiRecognizer, Model, SetLogLevel
 ASR_RATE = 16000
 AUDIO_WINDOW_SECONDS = 2.0
 AUDIO_HOP_SECONDS = 0.25
-AUDIO_BEEP_SECONDS = 0.8
+AUDIO_BEEP_SECONDS = 0.45
 
 
 def normalize(value):
@@ -127,12 +127,17 @@ class Censor:
                     continue
                 label, score = self.audio_detector.detect(window)
                 if label:
+                    now = written / self.rate
+                    should_mark = False
+
                     with self.lock:
-                        now = written / self.rate
                         last = self.audio_last_accept.get(label, -10.0)
                         if now - last >= 0.70:
                             self.audio_last_accept[label] = now
-                            self.mark_audio(label, now)
+                            should_mark = True
+
+                    if should_mark:
+                        self.mark_audio(label, now)
                 time.sleep(self.audio_hop / self.rate)
         except Exception as exc:
             self.emit(f'AI audio recognition error: {exc}')
