@@ -11,7 +11,7 @@ Version 0.4.0 adds an optional AI audio keyword model. Vosk remains the main
 Greek word-list recognizer; the v4 model works alongside it as a helper
 detector for target speech patterns.
 
-The installer includes your trained v4 checkpoint:
+The installer includes my trained v4 checkpoint:
 
 ```text
 models/keyword_v4/model.pt
